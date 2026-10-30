@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#526e5c">
+<title>Um Lugar de Cada Vez | Acolhimento</title>
+<style>
+:root{--green:#526e5c;--sage:#708879;--ink:#34483c;--cream:#f5f1e9;--line:#e2e6df;--muted:#68756b}
+*{box-sizing:border-box}body{margin:0;background:#faf9f6;color:#26352c;font-family:Arial,sans-serif;line-height:1.6}
+main{max-width:850px;margin:auto;padding:24px 16px 50px}.hero{background:linear-gradient(145deg,#e8eee6,#f5f0e7);color:var(--ink);border-radius:24px;padding:42px 22px;text-align:center}
+.eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--sage);font-weight:700}
+h1{font-family:Georgia,serif;font-size:clamp(30px,6vw,48px);line-height:1.15;font-weight:400;margin:18px 0}
+.lead{max-width:570px;margin:auto;color:#637267;font-size:15px}
+section{margin-top:30px}.section-title{font-size:12px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);font-weight:700}
+.hint{font-size:13px;color:var(--muted)}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:15px 0}
+.choice{border:1px solid var(--line);background:white;border-radius:14px;padding:15px 12px;text-align:left;font-size:14px;color:#34483c;cursor:pointer;min-height:58px}
+.choice[aria-pressed=true]{border:2px solid var(--sage);background:#eaf0e9}
+button:focus-visible,a:focus-visible{outline:3px solid #9bad9c;outline-offset:3px}
+.primary{background:var(--green);color:white;border:0;border-radius:30px;padding:15px 20px;width:100%;font-weight:700;cursor:pointer}
+.primary:disabled{opacity:.45;cursor:not-allowed}
+.result{background:linear-gradient(145deg,#f3efe6,#e8eee7);border-radius:20px;padding:27px 22px;text-align:center;margin-top:18px;color:var(--ink)}
+.quote{font:normal 24px/1.5 Georgia,serif;margin:18px 0}.small{border:1px solid #8b9e90;background:transparent;border-radius:30px;padding:10px 16px;color:#405749;cursor:pointer;margin:4px}
+.panel{border:1px solid var(--line);border-radius:18px;padding:20px;background:white}
+.linkrow{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px;margin-top:9px;border-radius:12px;background:#f5f7f3;text-decoration:none;color:#34483c}
+.linkrow strong{display:block}.muted{font-size:12px;color:var(--muted)}
+.donate{background:linear-gradient(145deg,#f3efe6,#e8eee7);border:1px solid #e1e7df;border-radius:20px;padding:24px;text-align:center}
+.donate h2{font:normal 27px Georgia,serif;color:var(--ink);margin:10px 0}
+.donate p{font-size:14px;color:#53665a;max-width:620px;margin:12px auto}
+.donate a{display:inline-block;background:var(--green);color:#fff;text-decoration:none;padding:14px 24px;border-radius:30px;font-weight:700;margin:10px 0}
+footer{text-align:center;color:#7a867c;font:12px/1.7 Arial,sans-serif;margin-top:32px}
+@media(max-width:520px){.choices{grid-template-columns:1fr}.hero{padding:32px 18px}.quote{font-size:21px}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+ <div class="eyebrow">Um espaço de acolhimento</div>
+ <h1>Você não precisa<br>ter todas as respostas.</h1>
+ <p class="lead">Às vezes, tudo o que precisamos é de uma palavra que nos ajude a continuar. Este espaço foi criado para esses momentos.</p>
+ <div style="font-size:25px;margin-top:18px;color:#708879">✳</div>
+</header>
+
+<section>
+ <div class="section-title">01 — O que você está enfrentando?</div>
+ <p class="hint">Escolha a dificuldade que mais se aproxima do que você está vivendo.</p>
+ <div class="choices" id="choices">
+  <button class="choice" data-cat="ansiedade" aria-pressed="false">☁ &nbsp; Ansiedade</button>
+  <button class="choice" data-cat="tristeza" aria-pressed="false">🌧 &nbsp; Tristeza e depressão</button>
+  <button class="choice" data-cat="solidao" aria-pressed="false">♡ &nbsp; Solidão</button>
+  <button class="choice" data-cat="autoestima" aria-pressed="false">✿ &nbsp; Autoestima</button>
+  <button class="choice" data-cat="luto" aria-pressed="false">🕊 &nbsp; Luto e saudade</button>
+  <button class="choice" data-cat="estresse" aria-pressed="false">☼ &nbsp; Estresse e esgotamento</button>
+  <button class="choice" data-cat="medo" aria-pressed="false">❋ &nbsp; Medo e insegurança</button>
+  <button class="choice" data-cat="termino" aria-pressed="false">♡ &nbsp; Término e recomeços</button>
+ </div>
+ <button id="generate" class="primary" disabled>Preciso de uma palavra de apoio →</button>
+ <div id="result" class="result" hidden aria-live="polite">
+  <div class="eyebrow">Uma mensagem para este momento</div>
+  <div id="quote" class="quote"></div>
+  <div id="counter" class="muted"></div>
+  <div style="margin-top:16px">
+   <button id="again" class="small">↻ Outra mensagem</button>
+   <button id="copy" class="small">Copiar mensagem</button>
+  </div>
+ </div>
+</section>
+
+<section class="panel">
+ <div class="section-title">02 — Você não precisa enfrentar tudo sozinho</div>
+ <p class="hint">Se estiver passando por um momento difícil e precisar conversar com alguém, existem pessoas preparadas para ouvir você.</p>
+ <a class="linkrow" href="tel:188"><span><strong>CVV — Apoio emocional</strong><span class="muted">Gratuito, sigiloso, 24 horas</span></span><strong>188 ↗</strong></a>
+ <a class="linkrow" href="https://www.cvv.org.br/" target="_blank" rel="noopener"><span><strong>Atendimento online do CVV</strong><span class="muted">Chat e outras formas de contato</span></span><strong>↗</strong></a>
+ <a class="linkrow" href="tel:192"><span><strong>SAMU — Emergências</strong><span class="muted">Risco imediato ou emergência médica</span></span><strong>192 ↗</strong></a>
+ <p class="muted" style="margin-top:14px">Se houver risco imediato de se machucar, procure uma UPA ou pronto-socorro, ligue 192 e, se possível, fique perto de alguém de confiança. Este site oferece apoio complementar e não substitui acompanhamento psicológico ou médico.</p>
+</section>
+
+<section class="donate">
+ <div style="font-size:27px;color:#708879">♡</div>
+ <div class="eyebrow">Apoio voluntário</div>
+ <h2>Ajude este projeto a continuar</h2>
+ <p>Este projeto nasceu do desejo de oferecer palavras de acolhimento a quem enfrenta momentos difíceis. As contribuições voluntárias ajudam a manter o site, desenvolver novas funcionalidades e apoiar a continuidade do trabalho de quem está por trás dele.</p>
+ <p>Se este espaço tocou seu coração e estiver ao seu alcance, você pode contribuir. Sua ajuda é espontânea: todo o conteúdo de acolhimento continuará gratuito, independentemente de qualquer doação.</p>
+ <a href="https://mpago.la/2eKryo6" target="_blank" rel="noopener noreferrer">♡ Apoiar este projeto</a>
+ <div class="muted">Pagamento realizado na página do Mercado Pago. Confira o destinatário e os dados antes de confirmar.</div>
+</section>
+
+<footer>
+ <div style="font:24px Georgia,serif;color:#849887">✳</div>
+ <div style="font-family:Georgia,serif;font-size:16px;font-style:italic;color:#53665a">Um passo de cada vez também é um caminho.</div>
+ <div>UM LUGAR DE CADA VEZ · UM ESPAÇO PARA VOCÊ</div>
+</footer>
+</main>
+<script>
+const messages = {
+ansiedade: [
+"Você não precisa resolver amanhã enquanto ainda está tentando respirar em paz hoje.",
+"Nem todo pensamento que assusta é uma previsão do que vai acontecer.",
+"Seu corpo pode estar em alerta, mas você merece encontrar momentos de segurança.",
+"Não transforme cada possibilidade em uma obrigação de se preparar para o pior.",
+"Você pode fazer uma coisa de cada vez. O restante pode esperar.",
+"Mesmo quando sua mente corre, você não precisa acompanhar a velocidade dela.",
+"Não é fraqueza precisar parar. Às vezes, parar é a maneira mais corajosa de continuar.",
+"Você não precisa ter certeza de tudo para dar o próximo passo.",
+"Um dia difícil não significa que todos os próximos serão iguais.",
+"Não se cobre por conseguir controlar sentimentos que nem sempre escolhem a hora de chegar.",
+"Você merece descanso mesmo quando sua cabeça insiste que ainda falta fazer alguma coisa.",
+"Respirar e reconhecer o que sente já pode ser um começo.",
+"Você não precisa ensaiar todas as conversas antes de permitir que elas aconteçam.",
+"Não deixe que o medo de errar roube todas as oportunidades de tentar.",
+"Há uma diferença entre estar preparado e viver esperando uma tragédia.",
+"Se hoje tudo parece urgente, lembre-se de que nem tudo precisa de resposta agora.",
+"Você pode sentir medo e ainda assim escolher com cuidado o que fazer.",
+"Não precisa vencer todos os pensamentos. Pode aprender a não obedecer a cada um deles.",
+"Seu valor não depende de quantas coisas você consegue controlar.",
+"Você não está atrasado por precisar de mais tempo para se sentir seguro.",
+"Permita-se viver o momento que existe, em vez de sofrer por todos os que ainda não chegaram.",
+"Não é necessário transformar uma dúvida em uma sentença contra você.",
+"Até os dias confusos merecem pausas e gentileza.",
+"Você pode pedir companhia quando seus pensamentos estiverem pesados demais.",
+"Não precisa provar sua força suportando tudo em silêncio.",
+"Pequenos avanços continuam sendo avanços, mesmo quando ninguém percebe.",
+"Você merece viver sem precisar antecipar cada possível problema.",
+"Se o coração está acelerado, trate-se com cuidado, não com cobrança.",
+"Não confunda a intensidade do seu medo com a certeza de que algo ruim acontecerá.",
+"Hoje, tente trocar a exigência de controlar tudo pela possibilidade de cuidar do próximo passo."
+],
+tristeza: [
+"Você não precisa fingir que está bem para merecer a presença de alguém.",
+"Há dias em que levantar da cama já exige uma força que ninguém consegue enxergar.",
+"Seu sofrimento não precisa ser comparado ao de outra pessoa para ser levado a sério.",
+"Você não é um peso por precisar de cuidado quando a vida fica difícil.",
+"Não transforme a falta de energia de hoje em uma definição de quem você é.",
+"Você merece receber carinho mesmo quando não consegue oferecer seu melhor.",
+"Não precisa encontrar um motivo para sorrir antes de permitir que alguém fique ao seu lado.",
+"Uma fase dolorosa não resume a história inteira da sua vida.",
+"Você não precisa melhorar na velocidade que os outros esperam.",
+"Mesmo quando não consegue enxergar esperança, isso não significa que ela deixou de existir.",
+"Há uma diferença entre não conseguir hoje e nunca conseguir.",
+"Você não precisa esconder sua tristeza para não incomodar os outros.",
+"Não é preciso conquistar nada para justificar seu direito de existir e ser cuidado.",
+"Se tudo parece pesado, talvez seja hora de dividir esse peso com alguém.",
+"Você merece ajuda antes de chegar ao seu limite.",
+"Não se culpe por dias em que até as tarefas simples parecem enormes.",
+"Seu passado não determina tudo o que ainda pode acontecer.",
+"Você não precisa se punir por não sentir alegria neste momento.",
+"Permita que alguém conheça sua dor sem exigir que essa pessoa tenha todas as respostas.",
+"Descansar não é desistir da sua vida.",
+"Você continua merecendo oportunidades, mesmo depois de muitas decepções.",
+"Não é preciso acreditar em um futuro inteiro agora; buscar apoio já importa.",
+"Seu valor não diminui nos dias em que você não consegue produzir.",
+"Você não precisa enfrentar sozinho aquilo que está além das suas forças.",
+"Pequenas necessidades também importam: comer, dormir, conversar e ser ouvido.",
+"Não confunda o silêncio de um dia difícil com a ausência de possibilidades.",
+"Você merece ser tratado com a mesma delicadeza que ofereceria a alguém querido.",
+"Não há vergonha em procurar ajuda para aquilo que está doendo por dentro.",
+"Você não precisa transformar sua dor em uma lição para que ela seja respeitada.",
+"Mesmo sem perceber, sua história ainda está sendo escrita."
+],
+solidao: [
+"Estar sozinho neste momento não significa que você seja impossível de amar.",
+"Você merece relações em que não precise implorar para ser lembrado.",
+"Não diminua sua necessidade de afeto só porque alguém não soube oferecê-lo.",
+"A ausência de mensagens não mede a importância da sua existência.",
+"Você pode sentir falta de companhia sem precisar aceitar qualquer companhia.",
+"Não há nada de vergonhoso em desejar alguém com quem dividir um dia comum.",
+"Ser compreendido é importante, e você merece procurar pessoas dispostas a ouvir.",
+"Não confunda uma fase de isolamento com o seu destino.",
+"Você não precisa se tornar outra pessoa para merecer amizades verdadeiras.",
+"Há conversas que começam com uma simples mensagem enviada no momento certo.",
+"Seu mundo não precisa permanecer tão pequeno quanto parece hoje.",
+"Você merece estar perto de quem demonstra interesse, não apenas de quem aparece quando convém.",
+"Não é fraqueza sentir falta de um abraço.",
+"Você não precisa esconder sua carência para parecer independente.",
+"Uma conexão verdadeira não exige que você esteja sempre divertido ou disponível.",
+"Permita-se conhecer pessoas sem a obrigação de ser aceito por todas.",
+"Você merece ser lembrado também nos dias em que não tem nada a oferecer.",
+"A solidão pode ser intensa, mas não define seu valor social.",
+"Não transforme experiências ruins em uma regra sobre todas as pessoas.",
+"Você pode construir vínculos aos poucos, sem precisar confiar em alguém de imediato.",
+"Ser diferente não significa estar condenado a não encontrar seu lugar.",
+"Você merece conversas em que sua presença também seja desejada.",
+"Não precisa preencher todo silêncio com alguém que não respeita você.",
+"Procurar um grupo ou uma atividade compartilhada pode ser uma abertura para novas conexões.",
+"Você pode pedir companhia sem sentir que está exigindo demais.",
+"Não existe prazo para encontrar pessoas com quem você se sinta em casa.",
+"Seu jeito de ser merece espaço, mesmo que nem todos consigam compreendê-lo.",
+"Você não precisa aceitar migalhas de atenção por medo de ficar só.",
+"Uma amizade pode começar muito antes de você perceber que encontrou alguém especial.",
+"Mesmo hoje, você continua merecendo pertencimento, respeito e afeto."
+],
+autoestima: [
+"Você não precisa se parecer com alguém para ter motivos para gostar de si.",
+"Seu corpo não precisa alcançar um padrão para merecer respeito.",
+"Não transforme uma fotografia ruim em uma opinião definitiva sobre sua aparência.",
+"Você é mais do que aquilo que consegue enxergar diante do espelho.",
+"Não diminua suas conquistas só porque outras pessoas chegaram mais longe.",
+"Seu valor não está condicionado à aprovação de quem não conhece sua história.",
+"Você merece falar consigo mesmo sem usar palavras que jamais usaria com alguém querido.",
+"Não precisa ser perfeito para ser digno de amor.",
+"Comparar seus bastidores com o melhor momento de outra pessoa é uma cobrança injusta.",
+"Você pode reconhecer suas dificuldades sem transformar isso em desprezo por si.",
+"Não deixe um erro apagar todas as vezes em que você tentou acertar.",
+"Seu ritmo não precisa ser igual ao de ninguém.",
+"Você não precisa pedir desculpas por ocupar espaço.",
+"Há qualidades em você que não dependem da aparência ou do desempenho.",
+"Não é arrogância reconhecer aquilo que você faz bem.",
+"Você merece ser tratado com respeito, inclusive por você mesmo.",
+"Não use a rejeição de uma pessoa como medida do seu valor.",
+"Seu progresso merece reconhecimento mesmo quando ainda há coisas que deseja mudar.",
+"Você pode querer evoluir sem precisar odiar quem é hoje.",
+"Não confunda humildade com a obrigação de se diminuir.",
+"Seu rosto, seu corpo e sua história não precisam da aprovação de todos.",
+"Você não precisa conquistar a atenção de ninguém para ter importância.",
+"Aprender a se respeitar também significa estabelecer limites.",
+"Não há necessidade de competir com a versão editada da vida de outra pessoa.",
+"Você merece celebrar suas pequenas vitórias sem se sentir culpado.",
+"Ser gentil consigo mesmo não significa deixar de crescer.",
+"Não permita que uma crítica se transforme na única voz que você escuta.",
+"Você não é menos interessante por ter inseguranças.",
+"Seu valor não desaparece nos dias em que você não se sente bonito ou confiante.",
+"Você pode começar a se tratar melhor antes mesmo de acreditar completamente nisso."
+],
+luto: [
+"A saudade não precisa desaparecer para que você encontre maneiras de continuar vivendo.",
+"Sentir falta de alguém é uma expressão do espaço que essa pessoa ocupou em sua história.",
+"Não existe um calendário universal para aprender a conviver com uma perda.",
+"Você pode sorrir em um dia e sentir saudade no seguinte. Uma coisa não apaga a outra.",
+"Não precisa guardar toda a dor para honrar a memória de quem partiu.",
+"Há lembranças que merecem ser acolhidas sem pressa.",
+"Você não está desrespeitando ninguém ao encontrar novos motivos para viver.",
+"Alguns dias serão mais difíceis, e isso não significa que você voltou ao começo.",
+"Não se cobre por conseguir explicar uma saudade que às vezes nem cabe em palavras.",
+"Permita-se chorar sem transformar suas lágrimas em sinal de fraqueza.",
+"Você pode guardar o amor e, aos poucos, aprender a carregar a ausência.",
+"Não precisa escolher entre lembrar e seguir em frente.",
+"Cada pessoa encontra seu próprio jeito de atravessar uma despedida.",
+"Não há obrigação de parecer forte enquanto seu coração tenta compreender a perda.",
+"Uma memória bonita pode continuar existindo mesmo quando o presente dói.",
+"Você merece companhia também nos dias em que a saudade chega sem avisar.",
+"Não se culpe por coisas que já não estão ao seu alcance mudar.",
+"O amor vivido não perde sua importância porque a presença física terminou.",
+"Não existe maneira perfeita de sentir luto.",
+"Você pode precisar de ajuda mesmo depois de muito tempo da perda.",
+"Não precisa transformar cada lembrança em tristeza para provar que se importa.",
+"Há espaço para a saudade e também para novos momentos.",
+"Não apresse seu coração para chegar a um lugar onde ainda não consegue estar.",
+"Você não precisa carregar tudo em silêncio para demonstrar amor.",
+"Se a data de hoje machuca, permita-se atravessá-la com cuidado.",
+"Uma despedida não apaga a importância de uma história compartilhada.",
+"Não é necessário esquecer para continuar vivendo.",
+"Seu jeito de lembrar também pode mudar com o tempo.",
+"Você merece acolhimento sem cobranças sobre como deveria estar se sentindo.",
+"Vá no seu ritmo. A sua dor merece respeito."
+],
+estresse: [
+"Você não precisa resolver todos os problemas de uma vez para merecer descansar.",
+"Ser responsável não significa estar disponível para tudo o tempo inteiro.",
+"Seu limite não é um defeito de personalidade.",
+"Uma pausa pode ser mais produtiva do que continuar sem conseguir pensar.",
+"Não transforme cada tarefa pendente em uma medida do seu valor.",
+"Você também é uma pessoa que precisa de cuidado, não apenas alguém que precisa dar conta das coisas.",
+"Nem toda urgência dos outros precisa se tornar sua emergência.",
+"Não é possível oferecer o melhor de si quando você nunca tem espaço para se recuperar.",
+"Permita-se terminar o dia sem exigir que tudo esteja perfeito.",
+"Você não precisa conquistar o descanso por meio do esgotamento.",
+"Fazer menos em um dia difícil pode ser uma decisão sensata.",
+"Não confunda estar ocupado com estar bem.",
+"Há tarefas que podem esperar enquanto você cuida de si.",
+"Seu corpo merece ser ouvido antes de precisar gritar por atenção.",
+"Você pode reorganizar prioridades sem considerar isso um fracasso.",
+"Não precisa carregar responsabilidades que deveriam ser compartilhadas.",
+"Um passo organizado vale mais do que dez passos dados em desespero.",
+"Você merece momentos que não sejam preenchidos por cobranças.",
+"Não transforme produtividade em condição para gostar de si.",
+"Descansar também faz parte de qualquer jornada sustentável.",
+"Você não precisa responder imediatamente a tudo e a todos.",
+"Pequenos limites podem proteger uma energia que está acabando.",
+"Não há mérito em adoecer tentando provar que consegue suportar tudo.",
+"Você pode pedir ajuda antes que o cansaço se torne insuportável.",
+"Seu trabalho é uma parte da vida, não a medida inteira dela.",
+"Não é necessário terminar tudo hoje para reconhecer o que já fez.",
+"Organizar o próximo passo pode ser suficiente por enquanto.",
+"Você merece uma rotina que permita respirar, não apenas sobreviver às horas.",
+"Não se culpe por precisar desacelerar.",
+"Seu bem-estar também precisa entrar na lista de prioridades."
+],
+medo: [
+"Coragem não significa não sentir medo, mas poder escolher com cuidado apesar dele.",
+"Você não precisa saber exatamente como tudo terminará para começar.",
+"Não permita que uma possibilidade ruim apague todas as outras possibilidades.",
+"Errar não significa que você perdeu o direito de tentar novamente.",
+"Você pode dar passos pequenos sem diminuir a importância deles.",
+"Não precisa se tornar alguém sem inseguranças para viver experiências novas.",
+"Uma decisão difícil pode ser enfrentada com tempo e informação.",
+"Não transforme a opinião de alguém em uma sentença sobre o seu futuro.",
+"Você merece oportunidades mesmo que ainda esteja aprendendo a confiar em si.",
+"Não precisa ter certeza de que dará certo para descobrir o que é possível.",
+"Seu medo merece ser ouvido, mas não precisa decidir tudo por você.",
+"Há coisas que só ficam mais claras depois do primeiro passo.",
+"Não confunda falta de experiência com incapacidade.",
+"Você pode recomeçar sem apagar tudo o que aprendeu.",
+"Não se cobre por sentir receio diante de algo importante.",
+"Um limite respeitado também é uma demonstração de coragem.",
+"Você não precisa provar nada para quem torce contra você.",
+"Não deixe que um fracasso antigo escreva todas as próximas páginas.",
+"É permitido pedir orientação quando o caminho parece desconhecido.",
+"Você pode aprender enquanto caminha, não precisa saber tudo antes.",
+"Não transforme a incerteza em uma proibição de viver.",
+"Mesmo uma mudança pequena pode abrir possibilidades que você ainda não conhece.",
+"Você merece tomar decisões sem viver prisioneiro da aprovação alheia.",
+"Não é tarde para desenvolver uma habilidade que hoje parece distante.",
+"Seu futuro não precisa ser uma cópia das experiências que machucaram você.",
+"Você pode proteger seus limites e ainda permanecer aberto a novas possibilidades.",
+"Não precisa enfrentar tudo de uma vez para demonstrar força.",
+"Permita-se tentar sem exigir de si uma garantia de sucesso.",
+"Há diferença entre se preparar para um risco e abandonar todos os seus planos por medo.",
+"Você merece descobrir do que é capaz sem se condenar antecipadamente."
+],
+termino: [
+"O fim de uma relação não significa o fim da sua capacidade de amar e ser amado.",
+"Você pode sentir saudade de alguém e ainda reconhecer que precisava seguir outro caminho.",
+"Não transforme a escolha de outra pessoa em uma medida do seu valor.",
+"Não precisa apagar suas lembranças para começar uma nova fase.",
+"Às vezes, aceitar que algo mudou é o primeiro passo para cuidar de si.",
+"Você merece reciprocidade, não apenas a esperança de que um dia ela apareça.",
+"Não volte a se diminuir para caber em uma relação que machuca você.",
+"Uma despedida pode doer sem significar que tudo o que viveu foi inútil.",
+"Você não precisa encontrar outra pessoa imediatamente para provar que superou.",
+"Não confunda estar sozinho com estar incompleto.",
+"Permita-se sentir falta sem transformar a saudade em obrigação de voltar.",
+"Você merece uma relação em que respeito e cuidado não sejam negociáveis.",
+"Não precisa competir com o passado de ninguém para merecer amor.",
+"Seu coração pode precisar de tempo, e isso não é um atraso.",
+"Não se culpe por ter acreditado em algo que desejava que desse certo.",
+"Você pode aprender com uma relação sem carregar toda a culpa por seu fim.",
+"Não é necessário manter uma porta aberta para quem repetidamente machuca você.",
+"Seu recomeço não precisa ser anunciado para ser verdadeiro.",
+"Você merece construir uma vida que não dependa da presença de uma pessoa específica.",
+"Não transforme o silêncio de alguém em uma explicação sobre quem você é.",
+"É possível amar uma lembrança e escolher não voltar para a mesma situação.",
+"Você não precisa aceitar menos do que respeito por medo de perder alguém.",
+"Um relacionamento terminou, mas sua história pessoal continua.",
+"Não existe obrigação de superar tudo em poucas semanas.",
+"Você pode redescobrir atividades, amizades e sonhos que ficaram em segundo plano.",
+"Não use a felicidade aparente de outra pessoa como cobrança para a sua recuperação.",
+"Seu próximo capítulo não precisa repetir os erros do anterior.",
+"Você merece paz tanto quanto deseja companhia.",
+"Não confunda o vazio de uma mudança com a ausência de futuro.",
+"Recomeçar também é aprender a não abandonar a si mesmo."
+]
+};
+const names={ansiedade:"Ansiedade",tristeza:"Tristeza e depressão",solidao:"Solidão",autoestima:"Autoestima",luto:"Luto e saudade",estresse:"Estresse e esgotamento",medo:"Medo e insegurança",termino:"Término e recomeços"};
+let selected=null,used={},last="";
+const buttons=[...document.querySelectorAll(".choice")],generate=document.getElementById("generate"),result=document.getElementById("result");
+buttons.forEach(button=>button.addEventListener("click",()=>{selected=button.dataset.cat;buttons.forEach(b=>b.setAttribute("aria-pressed",String(b===button)));generate.disabled=false;result.hidden=true;}));
+function nextMessage(){if(!selected)return;used[selected]??=[];if(used[selected].length===30)used[selected]=[];const available=messages[selected].map((_,i)=>i).filter(i=>!used[selected].includes(i));const index=available[Math.floor(Math.random()*available.length)];used[selected].push(index);last=messages[selected][index];document.getElementById("quote").textContent="“"+last+"”";document.getElementById("counter").textContent=names[selected]+" · mensagem "+used[selected].length+" de 30";result.hidden=false;result.scrollIntoView({behavior:"smooth",block:"nearest"});}
+generate.addEventListener("click",nextMessage);document.getElementById("again").addEventListener("click",nextMessage);
+document.getElementById("copy").addEventListener("click",async()=>{const btn=document.getElementById("copy");try{await navigator.clipboard.writeText(last);btn.textContent="Copiado ✓";setTimeout(()=>btn.textContent="Copiar mensagem",1600);}catch(e){btn.textContent="Não foi possível copiar";}});
+</script>
+</body>
+</html>
